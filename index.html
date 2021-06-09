@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Mapnik - LeafLet Preview</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
+  <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
+  <style type="text/css">
+    #basemapslidercontainer {
+      position: absolute;
+      top: 50px;
+      right: 10px;
+      z-index: 1000;
+    }
+
+    #basemapslider{
+      font-size:62.5%;
+      margin: 14px;
+      height: 125px;
+      width:7px;
+    }
+
+    #map{
+       width: 1520px;
+       height: 670px;
+    }
+
+    div.op {
+      font-size:62.5%;
+      padding:2px;
+      margin:2px;
+      width:7px;
+      display: inline-block;
+      }
+
+  </style>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+
+</head>
+
+<body>
+  <div id="map">
+    <div id="basemapslidercontainer" >
+      <div id="basemap" class="op" ></div>
+      <div id="satTiles" class="op" ></div>
+      <div id="landTiles" class="op" ></div>
+      <div id="popTiles" class="op" ></div>
+      <div id="seTiles" class="op" ></div>
+
+    </div>
+  </div>
+
+  <!-- <h3>TF.Landscape</h3>
+    <input id="slide" class="op" type="range" min="0" max="1" step="0.1" value="1" onchange="updateOpacity(this.value)">
+    <input id="slide" class="op" type="range" min="0" max="1" step="0.1" value="1" onchange="updateOpacity2(this.value)">
+  <hr> -->
+  <script>
+    $(document).ready(function () {
+      $("#basemap").slider({
+            animate: true,
+            value: 1,
+            orientation: "vertical",
+            min: 0,
+            max: 1,
+            step: 0.1,
+            slide: function (event, ui) {
+              baselayer.setOpacity(ui.value);
+            }
+       });
+       $("#satTiles").slider({
+            animate: true,
+            value: 1,
+            orientation: "vertical",
+            min: 0,
+            max: 1,
+            step: 0.1,
+            slide: function (event, ui) {
+              satTile.setOpacity(ui.value);
+            }
+       });
+       $("#landTiles").slider({
+            animate: true,
+            value: 1,
+            orientation: "vertical",
+            min: 0,
+            max: 1,
+            step: 0.1,
+            slide: function (event, ui) {
+              landTile.setOpacity(ui.value);
+            }
+       });
+       $("#popTiles").slider({
+            animate: true,
+            value: 1,
+            orientation: "vertical",
+            min: 0,
+            max: 1,
+            step: 0.1,
+            slide: function (event, ui) {
+              popTile.setOpacity(ui.value);
+            }
+       });
+       $("#seTiles").slider({
+            animate: true,
+            value: 1,
+            orientation: "vertical",
+            min: 0,
+            max: 1,
+            step: 0.1,
+            slide: function (event, ui) {
+              seTile.setOpacity(ui.value);
+            }
+       });
+
+        $('#basemap').mousedown(function(){
+          map.dragging.disable();
+        })
+        $('#satTiles').mouseup(function(){
+          map.dragging.disable();
+        })
+        $('#landTiles').mouseup(function(){
+          map.dragging.disable();
+        })
+        $('#popTiles').mouseup(function(){
+          map.dragging.disable();
+        })
+        $('#seTiles').mouseup(function(){
+          map.dragging.disable();
+        })
+
+  
+      var map = L.map('map').setView([23.9037, 121.0794], 6);
+      var baselayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 17,
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      var satTile = L.tileLayer('./tile_test/test_1/Mapnik/{z}/{x}/{y}.png', {
+        maxZoom: 17,
+        tms: false,
+        opacity: 0.6,
+        attribution: '-'
+      }).addTo(map);
+
+      var landTile = L.tileLayer('file:///D:/project_me/space_hack2021/Mapnik_space_hack/Mapnik_space_hack_land/land/{z}/{x}/{y}.png', {
+        maxZoom: 17,
+        tms: false,
+        opacity: 0.6,
+        attribution: '-'
+      }).addTo(map);
+
+      var popTile = L.tileLayer('file:///D:/project_me/space_hack2021/Mapnik_space_hack/Mapnik_space_hack_pop/pop/{z}/{x}/{y}.png', {
+        maxZoom: 17,
+        tms: false,
+        attribution: '-',
+      }).addTo(map);
+
+      var seTile = L.tileLayer('file:///D:/project_me/space_hack2021/Mapnik_space_hack/Mapnik_space_hack_se/se/{z}/{x}/{y}.png', {
+        maxZoom: 17,
+        tms: false,
+        attribution: '-',
+      }).addTo(map);
+
+      var overlays = {
+        "sat": satTile,
+        "land": landTile,
+        "pop": popTile,
+        "se": seTile,
+      }; 
+     
+      L.control.layers({'Basemap':baselayer},overlays).addTo(map);
+    })
+  </script>
+
+</body>
+</html>

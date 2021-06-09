@@ -5,9 +5,24 @@
   <title>Mapnik - LeafLet Preview</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+  <script src="src/plugins/leaflet-providers.js"></script>
+  <link rel="stylesheet" href="src/leaflet.css">
+  <link rel="stylesheet" href="src/css/bootstrap.css">
+  <link rel="stylesheet" href="src/plugins/L.Control.Pan.css">
+  <link rel="stylesheet" href="src/plugins/L.Control.Zoomslider.css">
+  <link rel="stylesheet" href="src/plugins/L.Control.MousePosition.css">
+  <link rel="stylesheet" href="src/plugins/L.Control.Sidebar.css">
+  <link rel="stylesheet" href="src/plugins/Leaflet.PolylineMeasure.css">
+  <link rel="stylesheet" href="src/plugins/easy-button.css">
+  <link rel="stylesheet" href="src/plugins/leaflet-opencage/src/css/L.Control.OpenCageSearch.css">
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
   <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
+
+
+
   <style type="text/css">
     #basemapslidercontainer {
       position: absolute;
@@ -37,14 +52,13 @@
       }
 
   </style>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-  <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+
+
 
 </head>
 
 <body>
-  <div id="map">
+  <div id="map"  class="col-md-12">
     <div id="basemapslidercontainer" >
       <div id="basemap" class="op" ></div>
       <div id="satTiles" class="op" ></div>
@@ -54,13 +68,107 @@
 
     </div>
   </div>
+  <div id="side-bar" class="col-md-3">
+    <button id='btnLocate' class='btn btn-primary btn-block'>Locate</button>
+    <button id='btnZocalo' class='btn btn-primary btn-block'>ZoomToZocalo</button>
+    <h4>Zoom Level: <span id='zoom-level'></span></h4>
+    <h4>Map Center: <span id='map-center'></span></h4>
+    <h4>Mouse Location: <span id='mouse-location'></span></h4>
+  </div>
 
   <!-- <h3>TF.Landscape</h3>
     <input id="slide" class="op" type="range" min="0" max="1" step="0.1" value="1" onchange="updateOpacity(this.value)">
     <input id="slide" class="op" type="range" min="0" max="1" step="0.1" value="1" onchange="updateOpacity2(this.value)">
   <hr> -->
   <script>
+    var mymap;
+    var lyrOSM;
+    var lyrOSMBW;
+    var lyrOTM;
+    var lyrOCM;
+    var lyrTrans;
+    var lyrSpinal;
+    var lyrOutdoors;
+    var lyrPioneer;
+    var lyrLandscape;
+    var lyrESRIWSM;
+    var lyrESRINatGeo;
+    var lyrESRITopo;
+    var lyrESRIImagery;
+    var lyrESRIGrey;
+    var lyrESRIOcean;
+    var lyrESRIDelorme;
+    var lyrWatercolor;
+    var lyrToner;
+    var lyrTerrain;
+    var lyrHereBasic;
+    var lyrHereHybrid;
+    var lyrHereTerrain;
+    var mrkCurrentLocation;
+    var popZocalo;
+    var ctlAttribute;
+    var ctlScale;
+    var ctlPan;
+    var ctlZoomslider;
+    var ctlMouseposition;
+    var ctlMeasure;
+    var ctlEasyButton;
+    var ctlSidebar;
+    var ctlSearch;
+    var ctlLayers;
+    var objBaseMaps;
+
     $(document).ready(function () {
+      lyrOSMBW = L.tileLayer.provider('OpenStreetMap.BlackAndWhite');
+      lyrOTM = L.tileLayer.provider('OpenTopoMap');
+      lyrOCM = L.tileLayer.provider('Thunderforest.OpenCycleMap');
+      lyrTrans = L.tileLayer.provider('Thunderforest.Transport');
+      lyrSpinal = L.tileLayer.provider('Thunderforest.SpinalMap');
+      lyrOutdoors = L.tileLayer.provider('Thunderforest.Outdoors');
+      lyrPioneer = L.tileLayer.provider('Thunderforest.Pioneer');
+      lyrLandscape = L.tileLayer.provider('Thunderforest.Landscape');
+      lyrESRIWSM = L.tileLayer.provider('Esri.WorldStreetMap');
+      lyrESRINatGeo = L.tileLayer.provider('Esri.NatGeoWorldMap');
+      lyrESRITopo = L.tileLayer.provider('Esri.WorldTopoMap');
+      lyrESRIImagery = L.tileLayer.provider('Esri.WorldImagery');
+      lyrESRIGrey = L.tileLayer.provider('Esri.WorldGrayCanvas');
+      lyrESRIOcean = L.tileLayer.provider('Esri.OceanBasemap');
+      lyrESRIDelorme = L.tileLayer.provider('Esri.DeLorme');
+      lyrWatercolor = L.tileLayer.provider('Stamen.Watercolor');
+      lyrToner = L.tileLayer.provider('Stamen.Toner');
+      lyrTerrain = L.tileLayer.provider('Stamen.Terrain');
+      lyrHereBasic = L.tileLayer.provider('HERE.normalDay');
+      lyrHereHybrid = L.tileLayer.provider('HERE.hybridDay');
+      lyrHereTerrain = L.tileLayer.provider('HERE.terrainDay');
+      
+      objBaseMaps = {
+          "Street - OSM":lyrOSM,
+          "Street - OSM B&W":lyrOSMBW,
+          "Recreation - Thunderforest Open Cycle":lyrOCM,
+          "Street - Thunderforest transport":lyrTrans,
+          "Art - Thunderforest Spinal Map":lyrSpinal,
+          "Recreation - Thunderforest Outdoors":lyrOutdoors,
+          "General - Thunderforest Pioneer":lyrPioneer,
+          "Topo - Thunderforest Landscape":lyrLandscape,
+          "Street - ESRI":lyrESRIWSM,
+          "General - ESRI National Geographic":lyrESRINatGeo,
+          "General - ESRI Delorme":lyrESRIDelorme,
+          "Imagery - ESRI Imagery":lyrESRIImagery,
+          "Topo - ESRI Topo":lyrESRITopo,
+          "General - ESRI Gray Canvas":lyrESRIGrey,
+          "Ocean - ESRI Ocean Base":lyrESRIOcean,
+          "Art - Stamen Watercolor":lyrWatercolor,
+          "Art - Stamen Toner":lyrToner,
+          "Topo - Stamen Terrain":lyrTerrain,
+          "Topo - HERE Terrain":lyrHereTerrain,
+          "Imagery - HERE Hybrid":lyrHereHybrid,
+          "General - HERE Basic":lyrHereBasic,
+          "Topo - Open Topo Map":lyrOTM
+      };
+      
+      ctlLayers = L.control.layers(objBaseMaps,{}, {sortLayers:true}).addTo(mymap);                
+      ctlPan = L.control.pan().addTo(mymap);
+
       $("#basemap").slider({
             animate: true,
             value: 1,
@@ -135,6 +243,8 @@
 
   
       var map = L.map('map').setView([23.9037, 121.0794], 6);
+
+
       var baselayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 17,
         attribution: 'Map data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
