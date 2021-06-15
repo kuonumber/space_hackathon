@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Mapnik - LeafLet Preview</title>
+  <title>Space hackathon - KOH</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -10,51 +10,95 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
   <!-- <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.min.css" rel="stylesheet" type="text/css"/> -->
+  <link rel="stylesheet" href="../src/css/bootstrap.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+  <link rel="stylesheet" href="../src/plugins/L.Control.Sidebar.css">
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css" integrity="sha256-46qynGAkLSFpVbEBog43gvNhfrOj+BmwXdxFgVK/Kvc=" crossorigin="anonymous" /> -->
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <!-- <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script> -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="../src/plugins/leaflet-providers.js"></script>
+  <!-- <script src="../src/plugins/easy-button.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+
+  <script src="../src/plugins/L.Control.Sidebar.js"></script>
+
+
   <style type="text/css">
     #basemapslidercontainer {
       position: absolute;
-      top: 50px;
+      top: 100px;
       right: 10px;
       z-index: 1000;
-    }
+    } 
 
-    #basemapslider{
+    /* #basemapslider{
       font-size:62.5%;
       margin: 14px;
-      height: 125px;
-      width:7px;
+      height: 100px;
+      width:3px;
+    } */
+
+    #mapDiv{
+       /* width: 1520px;
+       height: 670px; */
+       height:100vh;
     }
 
-    #map{
-       width: 1520px;
-       height: 670px;
-    }
-
-    div.op {
+    /* div.op {
       font-size:62.5%;
       padding:2px;
       margin:2px;
       width:7px;
       display: inline-block;
       }
+     */
+    .col-md-3:first-child {
+      background-color: rgba(210, 210, 228, 0.712);
+    }
+    
+    div.tilesTitle{
+      font-size: 20px;
+      color: rgb(239, 239, 243);
+    }
+
+    p.text-light{
+      font-size: 10px;
+      color: rgb(34, 34, 39);
+
+    }
 
   </style>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <!-- <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script> -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
+ 
+  <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> -->
 </head>
 
 <body>
-  <div id="map">
-    <div id="basemapslidercontainer" >
-      <div id="basemap" class="op" ></div>
-      <div id="satTiles" class="op" ></div>
-      <div id="landTiles" class="op" ></div>
-      <div id="popTiles" class="op" ></div>
-      <div id="seTiles" class="op" ></div>
+  <div id="side-bar" class="col-md-3 bg-warning text-dark">
+    <div class='tilesTitle'>satTiles</div>
+    <div id="satTiles" class="op bg-success text-white"></div>
+    <p class="text-light bg-dark">Your slider has a value of <span id="satTiles-value"></span></p>
 
+    <div class='tilesTitle'>landTiles</div>
+    <div id="landTiles" class="op bg-success text-white" ></div>
+    <p class="text-light bg-dark">Your slider has a value of <span id="landTiles-value"></span></p>
+
+    <div class='tilesTitle'>popTiles</div>
+    <div id="popTiles" class="op bg-success text-white" ></div>
+    <p class="text-light bg-dark">Your slider has a value of <span id="popTiles-value"></span></p>
+
+    <div class='tilesTitle'>seTiles</div>
+    <div id="seTiles" class="op bg-success text-white" ></div>
+    <p class="text-light bg-dark">Your slider has a value of <span id="seTiles-value"></span></p>
+
+  </div>
+
+  <div id="mapDiv" class="col-md-12">
+    <div id="basemapslidercontainer" >
+   
     </div>
   </div>
 
@@ -62,65 +106,87 @@
     <input id="slide" class="op" type="range" min="0" max="1" step="0.1" value="1" onchange="updateOpacity(this.value)">
     <input id="slide" class="op" type="range" min="0" max="1" step="0.1" value="1" onchange="updateOpacity2(this.value)">
   <hr> -->
-  <script>
+  <script>  
+  
     $(document).ready(function () {
-      $("#basemap").slider({
-            animate: true,
-            value: 1,
-            orientation: "vertical",
-            min: 0,
-            max: 1,
-            step: 0.1,
-            slide: function (event, ui) {
-              baselayer.setOpacity(ui.value);
-            }
-       });
+           
+
+      // $("#basemap").slider({
+      //       animate: true,
+      //       value: 0,
+      //       // orientation: "vertical",
+      //       min: 0,
+      //       max: 1,
+      //       step: 0.1,
+      //       slide: function (event, ui) {
+      //         baselayer.setOpacity(ui.value);
+
+      //         // $(this).find(".ui-slider-handle").html(ui.value);
+
+      //       },
+      //  });
+    
+
        $("#satTiles").slider({
             animate: true,
             value: 1,
-            orientation: "vertical",
+            // orientation: "vertical",
             min: 0,
             max: 1,
             step: 0.1,
             slide: function (event, ui) {
               satTile.setOpacity(ui.value);
+              $( "#satTiles-value" ).html( ui.value );
+
             }
        });
+
+
        $("#landTiles").slider({
             animate: true,
             value: 1,
-            orientation: "vertical",
+            // orientation: "vertical",
             min: 0,
             max: 1,
             step: 0.1,
             slide: function (event, ui) {
               landTile.setOpacity(ui.value);
+              $( "#landTiles-value" ).html( ui.value );
+
             }
        });
        $("#popTiles").slider({
             animate: true,
             value: 1,
-            orientation: "vertical",
+            // orientation: "vertical",
             min: 0,
             max: 1,
             step: 0.1,
             slide: function (event, ui) {
               popTile.setOpacity(ui.value);
+              $( "#popTiles-value" ).html( ui.value );
+
             }
        });
        $("#seTiles").slider({
             animate: true,
             value: 1,
-            orientation: "vertical",
+            // orientation: "vertical",
             min: 0,
             max: 1,
             step: 0.1,
             slide: function (event, ui) {
               seTile.setOpacity(ui.value);
-            }
+              $( "#seTiles-value" ).html( ui.value );
+            },
+            formatter: function(value) {
+		          return 'Current value: ' + value;
+            },
        });
+        
+        // $("#t1").text("Testing").width(50);
 
-        $('#basemap').mousedown(function(){
+        $('#seTiles').mousedown(function(){
           map.dragging.disable();
         })
         $('#satTiles').mouseup(function(){
@@ -137,14 +203,32 @@
         })
 
   
-      var map = L.map('map').setView([25.0294925,121.4803742], 14);
+      var map = L.map('mapDiv').setView([25.0294925,121.4803742], 14);
+      var helloPopup = L.popup().setContent('Hello World!');
+
+      // var ctlEasyButton = L.easyButton('glyphicon-screenshot').addTo(map);
+      
+
+      var ctlSidebar = L.control.sidebar('side-bar').addTo(map);
+      L.easyButton('glyphicon-transfer', function(){
+        ctlSidebar.toggle();
+      }).addTo(map);
+
+
       // var baselayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      var baselayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      var baselayer = L.tileLayer.provider('OpenStreetMap.Mapnik', {
       // var baselayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
 
         maxZoom: 17,
         attribution: 'Map data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
+
+      var baselayer2 = L.tileLayer.provider('Stadia.AlidadeSmoothDark');
+
+      baseMaps = {
+        "openStreetMap" : baselayer,
+        "Stadia" : baselayer2,
+      }
 
       var satTile = L.tileLayer('https://storage.googleapis.com/heroku_app/Mapnik_space_hack_sat/sat/{z}/{x}/{y}.png', {
         maxZoom: 17,
@@ -171,6 +255,7 @@
         tms: false,
         attribution: '-',
       }).addTo(map);
+      // add to map 將會在啟動頁面時自動啟用，如果沒有則需要手動勾選才會啟動
 
       var overlays = {
         "sat": satTile,
@@ -179,7 +264,7 @@
         "se": seTile,
       }; 
      
-      L.control.layers({'Basemap':baselayer},overlays).addTo(map);
+      L.control.layers(baseMaps, overlays).addTo(map);
     })
   </script>
 
